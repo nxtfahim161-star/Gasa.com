@@ -1,0 +1,154 @@
+/* styles.css — Gasa Intelligence Engine */
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #030508;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* Preloader Screen Styles */
+#preloader {
+    position: fixed;
+    inset: 0;
+    background-color: #030508;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.moon-icon-wrapper {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: moonPulse 2s infinite ease-in-out;
+}
+
+@keyframes moonPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.8)); }
+}
+
+.moon-glow {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.3) 0%, rgba(3, 5, 8, 0) 70%);
+    border-radius: 50%;
+}
+
+/* Twinkling Stars Canvas Background */
+#starsCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Glassmorphic Panels & Buttons */
+.glass-panel {
+    background: rgba(11, 15, 23, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient-blue {
+    background: linear-gradient(135deg, #ffffff 30%, #93c5fd 70%, #2563eb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.italic-serif {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+}
+
+html { 
+    scroll-behavior: smooth; 
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { 
+    width: 8px; 
+}
+::-webkit-scrollbar-track { 
+    background: #030508; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #1e293b; 
+    border-radius: 4px; 
+}
+// script.js — Gasa Intelligence Engine
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Lucide Icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // 2. Preloader Animation Logic (1.5 seconds timer)
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.style.opacity = '0';
+            preloader.style.visibility = 'hidden';
+        }, 1500);
+    }
+
+    // 3. Dynamic Twinkling Stars Background Effect
+    const canvas = document.getElementById('starsCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const stars = [];
+        const numStars = 150;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2 + 0.3,
+                alpha: Math.random(),
+                speed: Math.random() * 0.015 + 0.005
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.alpha += star.speed;
+                if (star.alpha > 1 || star.alpha < 0) {
+                    star.speed = -star.speed;
+                }
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+    }
+});
+  
