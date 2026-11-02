@@ -1,0 +1,43 @@
+name: Deploy Gasa Static Website to GitHub Pages
+
+on:
+  push:
+    branches: ["main"] # তোমার মেইন ব্রাঞ্চ যদি master হয়, তবে এখানে master লিখে দিবে
+
+  # গিটহাব অ্যাকশনস ট্যাব থেকে ম্যানুয়ালি রান করার অপশন
+  workflow_dispatch:
+
+# গিটহাব পেজেস ডিপ্লয়মেন্টের জন্য প্রয়োজনীয় পারমিশন
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# একসাথে একাধিক ডিপ্লয়মেন্ট যাতে কনফ্লিক্ট না করে
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Website Files (Artifact)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # যেহেতু তোমার প্রজেক্টের রুট ডিরেক্টরিতেই index.html আছে, তাই '.' দেওয়া হয়েছে
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
